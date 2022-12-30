@@ -2,9 +2,9 @@ import pygame
 
 AMARELO = (255, 255, 0)
 PRETO = (0, 0, 0)
-VELOCIDADE = 0.3
+VELOCIDADE = 0.1
 
-RAIO = 28
+RAIO = 30
 pygame.init()
 
 tela = pygame.display.set_mode((800, 600), 0)
@@ -16,8 +16,8 @@ class Pacman:
         self.linha = 1
         self.centro_x = 400
         self.centro_y = 300
-        self.vel_x = 0.3
-        self.vel_y = 0.1
+        self.vel_x = 0
+        self.vel_y = 0
         self.tamanho = 800 // 30
         self.raio = self.tamanho // 2
 
@@ -27,14 +27,11 @@ class Pacman:
         self.centro_x = int(self.coluna * self.tamanho + self.raio)
         self.centro_y = int(self.linha * self.tamanho + self.raio)
 
-        if self.centro_x + self.raio >= 800:
-            self.vel_x = -VELOCIDADE
-        if self.centro_x - self.raio <= 0:
-            self.vel_x = VELOCIDADE
-        if self.centro_y + self.raio > 600:
-            self.vel_y = -VELOCIDADE
-        if self.centro_y - self.raio <= 0:
-            self.vel_y = VELOCIDADE
+        if self.centro_x + self.raio >= 800 or self.centro_x - self.raio <= 0:
+            self.vel_x = 0
+        if self.centro_y + self.raio > 600 or self.centro_y - self.raio <= 0:
+            self.vel_y = 0
+
     def pintar(self, tela):
         pygame.draw.circle(tela, AMARELO, (self.centro_x, self.centro_y), self.raio, 0)
         canto_boca = (self.centro_x, self. centro_y)
@@ -43,11 +40,35 @@ class Pacman:
         pontos = [canto_boca, labio_superior, labio_inferior]
         pygame.draw.polygon(tela, PRETO, pontos, 0)
 
+    def processar_eventos(self, eventos):
+
+        for e in eventos:
+            if e.type == pygame.QUIT:
+                exit()
+            if e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_RIGHT:
+                    if self.centro_x + self.raio >= 800:
+                        self.vel_x = 0
+                    else:
+                        self.vel_x = VELOCIDADE
+                elif e.key == pygame.K_LEFT:
+                    if self.centro_x - self.raio <= 0:
+                        self.vel_x = 0
+                    else:
+                        self.vel_x = -VELOCIDADE
+                elif e.key == pygame.K_UP:
+                    if self.centro_y - self.raio <= 0:
+                        self.vel_y = 0
+                    else:
+                        self.vel_y = -VELOCIDADE
+                elif e.key == pygame.K_DOWN:
+                    if self.centro_y + self.raio > 600:
+                        self.vel_y = 0
+                    else:
+                        self.vel_y = VELOCIDADE
+
+
 if __name__ == "__main__":
-    x = 320
-    y = 240
-    vel_x = VELOCIDADE
-    vel_y = VELOCIDADE
     pacman = Pacman()
 
     while True:
@@ -55,12 +76,8 @@ if __name__ == "__main__":
         tela.fill(PRETO)
         pacman.calcular_regras()
 
-
         pacman.pintar(tela)
         pygame.display.update()
 
-        for e in pygame.event.get():
-            if e.type == pygame.KEYDOWN:
-                print(e.key)
-            if e.type == pygame.QUIT:
-                exit()
+        eventos = pygame.event.get()
+        pacman.processar_eventos(eventos)
