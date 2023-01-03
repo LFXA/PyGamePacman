@@ -11,6 +11,7 @@ pygame.init()
 
 tela = pygame.display.set_mode((800, 600), 0)
 
+fonte = pygame.font.SysFont("arial", 24, True,  False)
 
 class Cenario:
     def __init__(self, tamanho, pac):
@@ -48,12 +49,16 @@ class Cenario:
             [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
             [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
         ]
+    def pintar_pontos(self, tela):
+        pontos_x = 30 * self.tamanho
+        img_pontos = fonte.render("Score: {}".format(self.pontos), True, AMARELO)
+        tela.blit(img_pontos, (pontos_x, 50))
 
     def pintar_linha(self, tela, numero_linha, linha):
         for numero_coluna, coluna in enumerate(linha):
             x = numero_coluna * self.tamanho
             y = numero_linha * self.tamanho
-            half =(self.tamanho // 2)
+            half = (self.tamanho // 2)
             cor = PRETO
             if coluna == 2:
                 cor = AZUL
@@ -64,7 +69,7 @@ class Cenario:
     def pintar(self, tela):
         for numero_linha, linha in enumerate(self.matriz):
             self.pintar_linha(tela, numero_linha, linha)
-
+        self.pintar_pontos(tela)
     def calcular_regras(self):
         col = self.pacman.coluna_intencao
         lin = self.pacman.linha_intencao
@@ -109,25 +114,13 @@ class Pacman:
         for e in eventos:
             if e.type == pygame.KEYDOWN:
                 if e.key == pygame.K_RIGHT:
-                    if self.centro_x + self.raio >= 600:
-                        self.vel_x = 0
-                    else:
-                        self.vel_x = VELOCIDADE
+                    self.vel_x = VELOCIDADE
                 elif e.key == pygame.K_LEFT:
-                    if self.centro_x - self.raio <= 0:
-                        self.vel_x = 0
-                    else:
-                        self.vel_x = -VELOCIDADE
+                    self.vel_x = -VELOCIDADE
                 elif e.key == pygame.K_UP:
-                    if self.centro_y - self.raio <= 0:
-                        self.vel_y = 0
-                    else:
-                        self.vel_y = -VELOCIDADE
+                    self.vel_y = -VELOCIDADE
                 elif e.key == pygame.K_DOWN:
-                    if self.centro_y + self.raio > 600:
-                        self.vel_y = 0
-                    else:
-                        self.vel_y = VELOCIDADE
+                    self.vel_y = VELOCIDADE
 
     def aceitar_movimento(self):
         self.linha = self.linha_intencao
